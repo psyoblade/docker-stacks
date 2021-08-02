@@ -8,40 +8,46 @@ on:
   push:
     branches:
       - master
+      - main
     paths:
       - "docs/**"
       - ".github/workflows/sphinx.yml"
 
 jobs:
-  build:
+  build-docs:
     name: Build Sphinx Documentation
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     if: >
       !contains(github.event.head_commit.message , 'ci skip') &&
       !contains(github.event.pull_request.title, 'ci skip')
+
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
+
       - name: Set Up Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.x
+
       - name: Install Dev Dependencies
         run: |
           python -m pip install --upgrade pip
           make dev-env
+
       - name: Build Documentation
         run: make docs
+
       - name: Extract Source Strings
-        if: github.ref == 'refs/heads/master'
         working-directory: docs
         run: |
-          make gettext
-          sphinx-intl update -p _build/gettext -l en
+          sphinx-build -M gettext ./ ./_build/
+          sphinx-intl update -p ./_build/gettext -l en
+
       - name: Push Strings to Master
-        if: github.ref == 'refs/heads/master'
-        run: make git-commit
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          LOCAL_PATH: ./docs/locale/en
+        if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+        uses: stefanzweifel/git-auto-commit-action@5dd17c3b53a58c1cb5eaab903826abe94765ccd6 # dependabot updates to latest release
+        with:
+          commit_message: "[ci skip] Automated publish for ${{github.sha}}"
