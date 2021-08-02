@@ -1,6 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-ARG BASE_CONTAINER=jupyter/minimal-notebook
+ARG OWNER=jupyter
+ARG BASE_CONTAINER=$OWNER/minimal-notebook
 FROM $BASE_CONTAINER
 
 LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
@@ -8,57 +9,43 @@ LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
 USER root
 
 # ffmpeg for matplotlib anim & dvipng+cm-super for latex labels
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg dvipng cm-super && \
+RUN apt-get update --yes && \
+    apt-get install --yes --no-install-recommends ffmpeg dvipng cm-super && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-USER $NB_UID
+USER ${NB_UID}
 
 # Install Python 3 packages
 RUN conda install --quiet --yes \
+    'altair=4.1.*' \
     'beautifulsoup4=4.9.*' \
-    'conda-forge::blas=*=openblas' \
-    'bokeh=2.2.*' \
+    'bokeh=2.3.*' \
     'bottleneck=1.3.*' \
     'cloudpickle=1.6.*' \
+    'conda-forge::blas=*=openblas' \
     'cython=0.29.*' \
-    'dask=2.30.*' \
+    'dask=2021.6.*' \
     'dill=0.3.*' \
-    'h5py=3.1.*' \
-    'ipywidgets=7.5.*' \
-    'ipympl=0.5.*'\
-    'matplotlib-base=3.3.*' \
-    'numba=0.51.*' \
+    'h5py=3.3.*' \
+    'ipympl=0.7.*'\
+    'ipywidgets=7.6.*' \
+    'matplotlib-base=3.4.*' \
+    'numba=0.53.*' \
     'numexpr=2.7.*' \
-    'pandas=1.1.*' \
+    'pandas=1.3.*' \
     'patsy=0.5.*' \
-    'protobuf=3.13.*' \
+    'protobuf=3.17.*' \
     'pytables=3.6.*' \
-    'scikit-image=0.17.*' \
-    'scikit-learn=0.23.*' \
-    'scipy=1.5.*' \
+    'scikit-image=0.18.*' \
+    'scikit-learn=0.24.*' \
+    'scipy=1.7.*' \
     'seaborn=0.11.*' \
-    'sqlalchemy=1.3.*' \
+    'sqlalchemy=1.4.*' \
     'statsmodels=0.12.*' \
-    'sympy=1.7.*' \
-    'vincent=0.4.*' \
+    'sympy=1.8.*' \
     'widgetsnbextension=3.5.*'\
-    'xlrd=1.2.*' \
-    && \
+    'xlrd=2.0.*' && \
     conda clean --all -f -y && \
-    # Activate ipywidgets extension in the environment that runs the notebook server
-    jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
-    # Also activate ipywidgets extension for JupyterLab
-    # Check this URL for most recent compatibilities
-    # https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager
-    jupyter labextension install @jupyter-widgets/jupyterlab-manager@^2.0.0 --no-build && \
-    jupyter labextension install @bokeh/jupyter_bokeh@^2.0.0 --no-build && \
-    jupyter labextension install jupyter-matplotlib@^0.7.2 --no-build && \
-    jupyter lab build -y && \
-    jupyter lab clean -y && \
-    npm cache clean --force && \
-    rm -rf "/home/${NB_USER}/.cache/yarn" && \
-    rm -rf "/home/${NB_USER}/.node-gyp" && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
 
@@ -76,6 +63,6 @@ ENV XDG_CACHE_HOME="/home/${NB_USER}/.cache/"
 RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \
     fix-permissions "/home/${NB_USER}"
 
-USER $NB_UID
+USER ${NB_UID}
 
-WORKDIR $HOME
+WORKDIR "${HOME}"

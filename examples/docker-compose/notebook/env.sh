@@ -10,13 +10,13 @@
 export NAME
 
 # Exposed container port
-: ${PORT:=80}
+: "${PORT:=80}"
 export PORT
 
 # Container work volume name
-: "${WORK_VOLUME:=$NAME-work}"
+: "${WORK_VOLUME:=${NAME}-work}"
 export WORK_VOLUME
 
 # Container secrets volume name
-: "${SECRETS_VOLUME:=$NAME-secrets}"
+: "${SECRETS_VOLUME:=${NAME}-secrets}"
 export SECRETS_VOLUME
