@@ -44,7 +44,7 @@ jobs:
           version: latest
 
       - name: Clone Main Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: main
 
@@ -68,7 +68,7 @@ jobs:
         run: make -C main test-all
 
       - name: Clone Wiki
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: ${{github.repository}}.wiki
           path: wiki
