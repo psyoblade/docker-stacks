@@ -48,6 +48,6 @@ jobs:
 
       - name: Push Strings to Master
         if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
-        uses: stefanzweifel/git-auto-commit-action@5dd17c3b53a58c1cb5eaab903826abe94765ccd6 # dependabot updates to latest release
+        uses: stefanzweifel/git-auto-commit-action@49620cd3ed21ee620a48530e81dba0d139c9cb80 # dependabot updates to latest release
         with:
           commit_message: "[ci skip] Automated publish for ${{github.sha}}"
