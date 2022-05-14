@@ -5,14 +5,15 @@ import argparse
 import datetime
 import logging
 import os
-from typing import List
-from .docker_runner import DockerRunner
-from .get_taggers_and_manifests import get_taggers_and_manifests
-from .git_helper import GitHelper
-from .manifests import ManifestHeader, ManifestInterface
 
+from docker.models.containers import Container
 
-logger = logging.getLogger(__name__)
+from tagging.docker_runner import DockerRunner
+from tagging.get_taggers_and_manifests import get_taggers_and_manifests
+from tagging.git_helper import GitHelper
+from tagging.manifests import ManifestHeader, ManifestInterface
+
+LOGGER = logging.getLogger(__name__)
 
 
 BUILD_TIMESTAMP = datetime.datetime.utcnow().isoformat()[:-7] + "Z"
@@ -23,9 +24,9 @@ def append_build_history_line(
     short_image_name: str,
     owner: str,
     wiki_path: str,
-    all_tags: List[str],
+    all_tags: list[str],
 ) -> None:
-    logger.info("Appending build history line")
+    LOGGER.info("Appending build history line")
 
     date_column = f"`{BUILD_TIMESTAMP}`"
     image_column = MARKDOWN_LINE_BREAK.join(
@@ -43,7 +44,7 @@ def append_build_history_line(
     build_history_line = "|".join([date_column, image_column, links_column]) + "|"
 
     home_wiki_file = os.path.join(wiki_path, "Home.md")
-    with open(home_wiki_file, "r") as f:
+    with open(home_wiki_file) as f:
         file = f.read()
     TABLE_BEGINNING = "|-|-|-|\n"
     file = file.replace(TABLE_BEGINNING, TABLE_BEGINNING + build_history_line + "\n")
@@ -55,11 +56,11 @@ def create_manifest_file(
     short_image_name: str,
     owner: str,
     wiki_path: str,
-    manifests: List[ManifestInterface],
-    container,
+    manifests: list[ManifestInterface],
+    container: Container,
 ) -> None:
-    manifest_names = [manifest.__name__ for manifest in manifests]
-    logger.info(f"Using manifests: {manifest_names}")
+    manifest_names = [manifest.__class__.__name__ for manifest in manifests]
+    LOGGER.info(f"Using manifests: {manifest_names}")
 
     commit_hash_tag = GitHelper.commit_hash_tag()
     manifest_file = os.path.join(
@@ -77,7 +78,7 @@ def create_manifest_file(
 
 
 def create_manifests(short_image_name: str, owner: str, wiki_path: str) -> None:
-    logger.info(f"Creating manifests for image: {short_image_name}")
+    LOGGER.info(f"Creating manifests for image: {short_image_name}")
     taggers, manifests = get_taggers_and_manifests(short_image_name)
 
     image = f"{owner}/{short_image_name}:latest"
@@ -101,6 +102,6 @@ if __name__ == "__main__":
     arg_parser.add_argument("--wiki-path", required=True, help="Path to the wiki pages")
     args = arg_parser.parse_args()
 
-    logger.info(f"Current build timestamp: {BUILD_TIMESTAMP}")
+    LOGGER.info(f"Current build timestamp: {BUILD_TIMESTAMP}")
 
     create_manifests(args.short_image_name, args.owner, args.wiki_path)

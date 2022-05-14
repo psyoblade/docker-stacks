@@ -1,15 +1,15 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-import logging
-from plumbum.cmd import docker
-from .docker_runner import DockerRunner
-from .git_helper import GitHelper
+import plumbum
+from docker.models.containers import Container
+
+from tagging.docker_runner import DockerRunner
+from tagging.git_helper import GitHelper
+
+docker = plumbum.local["docker"]
 
 
-logger = logging.getLogger(__name__)
-
-
-def quoted_output(container, cmd: str) -> str:
+def quoted_output(container: Container, cmd: str) -> str:
     return "\n".join(
         [
             "```",
@@ -20,7 +20,7 @@ def quoted_output(container, cmd: str) -> str:
 
 
 class ManifestHeader:
-    """ManifestHeader doesn't fall under common interface and we run it separately"""
+    """ManifestHeader doesn't fall under common interface, and we run it separately"""
 
     @staticmethod
     def create_header(short_image_name: str, owner: str, build_timestamp: str) -> str:
@@ -54,29 +54,29 @@ class ManifestInterface:
     """Common interface for all manifests"""
 
     @staticmethod
-    def markdown_piece(container) -> str:
+    def markdown_piece(container: Container) -> str:
         raise NotImplementedError
 
 
 class CondaEnvironmentManifest(ManifestInterface):
     @staticmethod
-    def markdown_piece(container) -> str:
+    def markdown_piece(container: Container) -> str:
         return "\n".join(
             [
                 "## Python Packages",
                 "",
                 quoted_output(container, "python --version"),
                 "",
-                quoted_output(container, "conda info"),
+                quoted_output(container, "mamba info --quiet"),
                 "",
-                quoted_output(container, "conda list"),
+                quoted_output(container, "mamba list"),
             ]
         )
 
 
 class AptPackagesManifest(ManifestInterface):
     @staticmethod
-    def markdown_piece(container) -> str:
+    def markdown_piece(container: Container) -> str:
         return "\n".join(
             [
                 "## Apt Packages",
@@ -88,7 +88,7 @@ class AptPackagesManifest(ManifestInterface):
 
 class RPackagesManifest(ManifestInterface):
     @staticmethod
-    def markdown_piece(container) -> str:
+    def markdown_piece(container: Container) -> str:
         return "\n".join(
             [
                 "## R Packages",
@@ -105,7 +105,7 @@ class RPackagesManifest(ManifestInterface):
 
 class JuliaPackagesManifest(ManifestInterface):
     @staticmethod
-    def markdown_piece(container) -> str:
+    def markdown_piece(container: Container) -> str:
         return "\n".join(
             [
                 "## Julia Packages",
@@ -122,7 +122,7 @@ class JuliaPackagesManifest(ManifestInterface):
 
 class SparkInfoManifest(ManifestInterface):
     @staticmethod
-    def markdown_piece(container) -> str:
+    def markdown_piece(container: Container) -> str:
         return "\n".join(
             [
                 "## Apache Spark",

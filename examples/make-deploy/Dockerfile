@@ -2,7 +2,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 # Pick your favorite docker-stacks image
-FROM jupyter/minimal-notebook:33add21fab64
+FROM jupyter/minimal-notebook:6b49f3337709
 
 USER root
 
@@ -12,5 +12,5 @@ USER root
 USER ${NB_UID}
 
 # Switch back to jovyan to avoid accidental container runs as root
-# Add permanent pip/conda installs, data files, other user libs here
+# Add permanent mamba/pip/conda installs, data files, other user libs here
 # e.g., RUN pip install --quiet --no-cache-dir flake8
