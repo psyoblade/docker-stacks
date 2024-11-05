@@ -1,6 +1,5 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-
 import logging
 from pathlib import Path
 
@@ -18,7 +17,7 @@ THIS_DIR = Path(__file__).parent.resolve()
         (
             "matplotlib_1.py",
             "test.png",
-            "Test that matplotlib is able to plot a graph and write it as an image ...",
+            "Test that matplotlib can plot a graph and write it as an image ...",
         ),
         (
             "matplotlib_fonts_1.py",
@@ -39,11 +38,10 @@ def test_matplotlib(
     cont_data_dir = "/home/jovyan/data"
     output_dir = "/tmp"
     LOGGER.info(description)
-    command = "sleep infinity"
     running_container = container.run_detached(
         volumes={str(host_data_dir): {"bind": cont_data_dir, "mode": "ro"}},
         tty=True,
-        command=["start.sh", "bash", "-c", command],
+        command=["bash", "-c", "sleep infinity"],
     )
     command = f"python {cont_data_dir}/{test_file}"
     cmd = running_container.exec_run(command)

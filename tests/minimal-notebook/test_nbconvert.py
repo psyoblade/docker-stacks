@@ -1,6 +1,5 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-
 import logging
 from pathlib import Path
 
@@ -12,15 +11,8 @@ LOGGER = logging.getLogger(__name__)
 THIS_DIR = Path(__file__).parent.resolve()
 
 
-@pytest.mark.parametrize(
-    "test_file, output_format",
-    [
-        ("notebook_math", "pdf"),
-        ("notebook_math", "html"),
-        ("notebook_svg", "pdf"),
-        ("notebook_svg", "html"),
-    ],
-)
+@pytest.mark.parametrize("test_file", ["notebook_math", "notebook_svg"])
+@pytest.mark.parametrize("output_format", ["pdf", "html"])
 def test_nbconvert(
     container: TrackedContainer, test_file: str, output_format: str
 ) -> None:
@@ -36,7 +28,7 @@ def test_nbconvert(
         timeout=30,
         volumes={str(host_data_dir): {"bind": cont_data_dir, "mode": "ro"}},
         tty=True,
-        command=["start.sh", "bash", "-c", command],
+        command=["bash", "-c", command],
     )
     expected_file = f"{output_dir}/{test_file}.{output_format}"
     assert expected_file in logs, f"Expected file {expected_file} not generated"

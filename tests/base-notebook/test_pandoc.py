@@ -1,6 +1,5 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-
 import logging
 
 from tests.conftest import TrackedContainer
@@ -13,6 +12,6 @@ def test_pandoc(container: TrackedContainer) -> None:
     logs = container.run_and_wait(
         timeout=10,
         tty=True,
-        command=["start.sh", "bash", "-c", 'echo "**BOLD**" | pandoc'],
+        command=["bash", "-c", 'echo "**BOLD**" | pandoc'],
     )
     assert "<p><strong>BOLD</strong></p>" in logs

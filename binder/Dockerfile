@@ -1,10 +1,11 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-# https://hub.docker.com/r/jupyter/base-notebook/tags
+# https://quay.io/repository/jupyter/base-notebook?tab=tags
+ARG REGISTRY=quay.io
 ARG OWNER=jupyter
-ARG BASE_CONTAINER=$OWNER/base-notebook:6b49f3337709
-FROM $BASE_CONTAINER
+ARG BASE_IMAGE=$REGISTRY/$OWNER/base-notebook:2024-10-07
+FROM $BASE_IMAGE
 
 LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
 
@@ -12,6 +13,8 @@ LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
 # Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-ENV TAG="6b49f3337709"
+ENV TAG="2024-10-07"
 
 COPY --chown=${NB_UID}:${NB_GID} binder/README.ipynb "${HOME}"/README.ipynb
+
+RUN jupyter labextension disable "@jupyterlab/apputils-extension:announcements"

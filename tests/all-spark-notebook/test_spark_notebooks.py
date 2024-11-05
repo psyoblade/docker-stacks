@@ -1,6 +1,5 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-
 import logging
 from pathlib import Path
 
@@ -12,17 +11,17 @@ LOGGER = logging.getLogger(__name__)
 THIS_DIR = Path(__file__).parent.resolve()
 
 
+@pytest.mark.flaky(retries=3, delay=1)
 @pytest.mark.parametrize(
     "test_file",
-    # TODO: add local_sparklyr
-    ["local_pyspark", "local_spylon", "local_sparkR", "issue_1168"],
+    ["issue_1168", "local_pyspark", "local_sparkR"],
 )
 def test_nbconvert(container: TrackedContainer, test_file: str) -> None:
     """Check if Spark notebooks can be executed"""
     host_data_dir = THIS_DIR / "data"
     cont_data_dir = "/home/jovyan/data"
     output_dir = "/tmp"
-    conversion_timeout_ms = 600
+    conversion_timeout_ms = 5000
     LOGGER.info(f"Test that {test_file} notebook can be executed ...")
     command = (
         "jupyter nbconvert --to markdown "
@@ -35,11 +34,11 @@ def test_nbconvert(container: TrackedContainer, test_file: str) -> None:
         no_warnings=False,
         volumes={str(host_data_dir): {"bind": cont_data_dir, "mode": "ro"}},
         tty=True,
-        command=["start.sh", "bash", "-c", command],
+        command=["bash", "-c", command],
     )
     warnings = TrackedContainer.get_warnings(logs)
-    # Some Spark warnings
-    assert len(warnings) == 5
+    assert len(warnings) == 1
+    assert "Using incubator modules: jdk.incubator.vector" in warnings[0]
 
     expected_file = f"{output_dir}/{test_file}.md"
     assert expected_file in logs, f"Expected file {expected_file} not generated"

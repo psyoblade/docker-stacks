@@ -1,19 +1,19 @@
 # Package Updates
 
-As a general rule, we do not pin package versions in our `Dockerfile`s.
+Generally, we do not pin package versions in our `Dockerfile`s.
 Dependency resolution is a difficult thing to do.
-This means that packages might have old versions.
+All this means that packages might have old versions.
 Images are rebuilt weekly, so usually, packages receive updates quite frequently.
 
 ```{note}
-We pin major.minor version of python, so this will stay the same even after invoking the `mamba update` command.
+We pin major.minor version of Python, so this will stay the same even after invoking the `mamba update` command.
 ```
 
 ## Outdated packages
 
-In order to help to identify packages that can be updated you can use the following helper tool.
-It will list all the packages installed in the `Dockerfile` that can be updated -- dependencies are
-filtered to focus only on requested packages.
+To help identify packages that can be updated, you can use the following helper tool.
+It will list all the outdated packages installed in the `Dockerfile` --
+dependencies are filtered to focus only on requested packages.
 
 ```bash
 make check-outdated/base-notebook

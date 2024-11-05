@@ -3,7 +3,7 @@
 
 # BE CAREFUL when using Docker engine <1.10 because running a container with
 # `--rm` option while mounting a docker volume may wipe out the volume.
-# See issue: https://github.com/docker/docker/issues/17907
+# See issue: https://github.com/moby/moby/issues/17907
 
 # Use letsencrypt production server by default to get a real cert.
 # Use CERT_SERVER=--staging to hit the staging server (not a real cert).
@@ -30,7 +30,7 @@ letsencrypt:
 		--agree-tos \
 		--domain '$(FQDN)' \
 		--email '$(EMAIL)'; \
-		docker rm -f $(TMP_CONTAINER) > /dev/null
+		docker rm --force $(TMP_CONTAINER) > /dev/null
 # The letsencrypt image has an entrypoint, so we use the notebook image
 # instead so we can run arbitrary commands.
 # Here we set the permissions so nobody can read the cert and key.
@@ -42,7 +42,7 @@ letsencrypt:
 		$(NOTEBOOK_IMAGE) \
 		bash -c "ln -s /etc/letsencrypt/live/$(FQDN)/* /etc/letsencrypt/ && \
 			find /etc/letsencrypt -type d -exec chmod 755 {} +"; \
-			docker rm -f $(TMP_CONTAINER) > /dev/null
+			docker rm --force $(TMP_CONTAINER) > /dev/null
 
 letsencrypt-notebook: PORT?=443
 letsencrypt-notebook: NAME?=notebook
@@ -52,8 +52,8 @@ letsencrypt-notebook: DOCKER_ARGS:=-e USE_HTTPS=yes \
 	-e PASSWORD=$(PASSWORD) \
 	-v $(SECRETS_VOLUME):/etc/letsencrypt
 letsencrypt-notebook: ARGS:=\
-	--NotebookApp.certfile=/etc/letsencrypt/fullchain.pem \
-	--NotebookApp.keyfile=/etc/letsencrypt/privkey.pem
+	--ServerApp.certfile=/etc/letsencrypt/fullchain.pem \
+	--ServerApp.keyfile=/etc/letsencrypt/privkey.pem
 letsencrypt-notebook: check
 	@test -n "$(PASSWORD)" || \
 		(echo "ERROR: PASSWORD not defined or blank"; exit 1)

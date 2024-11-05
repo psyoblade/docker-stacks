@@ -9,7 +9,7 @@ from tests.conftest import TrackedContainer
 LOGGER = logging.getLogger(__name__)
 
 
-@pytest.mark.skip(reason="Not yet compliant with JupyterLab 3")
+@pytest.mark.skip(reason="Not yet compliant with JupyterLab 4")
 @pytest.mark.parametrize(
     "extension",
     [
@@ -21,7 +21,7 @@ LOGGER = logging.getLogger(__name__)
 def test_check_extension(container: TrackedContainer, extension: str) -> None:
     """Basic check of each extension
 
-    The list of extensions can be obtained through this command
+    The list of installed extensions can be obtained through this command:
 
     $ jupyter labextension list
 
@@ -30,5 +30,5 @@ def test_check_extension(container: TrackedContainer, extension: str) -> None:
     container.run_and_wait(
         timeout=10,
         tty=True,
-        command=["start.sh", "jupyter", "labextension", "check", extension],
+        command=["jupyter", "labextension", "check", extension],
     )

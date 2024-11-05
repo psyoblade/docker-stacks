@@ -12,18 +12,6 @@ def _get_program_version(container: Container, program: str) -> str:
     return DockerRunner.run_simple_command(container, cmd=f"{program} --version")
 
 
-def _get_env_variable(container: Container, variable: str) -> str:
-    env = DockerRunner.run_simple_command(
-        container,
-        cmd="env",
-        print_result=False,
-    ).split()
-    for env_entry in env:
-        if env_entry.startswith(variable):
-            return env_entry[len(variable) + 1 :]
-    raise KeyError(variable)
-
-
 def _get_pip_package_version(container: Container, package: str) -> str:
     PIP_VERSION_PREFIX = "Version: "
 
@@ -76,6 +64,13 @@ class PythonVersionTagger(TaggerInterface):
         return "python-" + _get_program_version(container, "python").split()[1]
 
 
+class PythonMajorMinorVersionTagger(TaggerInterface):
+    @staticmethod
+    def tag_value(container: Container) -> str:
+        full_version = PythonVersionTagger.tag_value(container)
+        return full_version[: full_version.rfind(".")]
+
+
 class JupyterNotebookVersionTagger(TaggerInterface):
     @staticmethod
     def tag_value(container: Container) -> str:
@@ -103,7 +98,16 @@ class RVersionTagger(TaggerInterface):
 class TensorflowVersionTagger(TaggerInterface):
     @staticmethod
     def tag_value(container: Container) -> str:
-        return "tensorflow-" + _get_pip_package_version(container, "tensorflow")
+        try:
+            return "tensorflow-" + _get_pip_package_version(container, "tensorflow")
+        except AssertionError:
+            return "tensorflow-" + _get_pip_package_version(container, "tensorflow-cpu")
+
+
+class PytorchVersionTagger(TaggerInterface):
+    @staticmethod
+    def tag_value(container: Container) -> str:
+        return "pytorch-" + _get_pip_package_version(container, "torch").split("+")[0]
 
 
 class JuliaVersionTagger(TaggerInterface):
@@ -115,13 +119,16 @@ class JuliaVersionTagger(TaggerInterface):
 class SparkVersionTagger(TaggerInterface):
     @staticmethod
     def tag_value(container: Container) -> str:
-        return "spark-" + _get_env_variable(container, "APACHE_SPARK_VERSION")
+        SPARK_VERSION_LINE_PREFIX = r"   /___/ .__/\_,_/_/ /_/\_\   version"
 
-
-class HadoopVersionTagger(TaggerInterface):
-    @staticmethod
-    def tag_value(container: Container) -> str:
-        return "hadoop-" + _get_env_variable(container, "HADOOP_VERSION")
+        spark_version = _get_program_version(container, "spark-submit")
+        version_line = next(
+            filter(
+                lambda line: line.startswith(SPARK_VERSION_LINE_PREFIX),
+                spark_version.split("\n"),
+            )
+        )
+        return "spark-" + version_line.split(" ")[-1]
 
 
 class JavaVersionTagger(TaggerInterface):

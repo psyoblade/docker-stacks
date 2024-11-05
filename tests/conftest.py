@@ -24,6 +24,12 @@ def find_free_port() -> str:
         return s.getsockname()[1]  # type: ignore
 
 
+def get_health(container: Container) -> str:
+    api_client = docker.APIClient()
+    inspect_results = api_client.inspect_container(container.name)
+    return inspect_results["State"]["Health"]["Status"]  # type: ignore
+
+
 @pytest.fixture(scope="session")
 def http_client() -> requests.Session:
     """Requests session with retries and backoff."""
@@ -72,8 +78,8 @@ class TrackedContainer:
         self.kwargs: Any = kwargs
 
     def run_detached(self, **kwargs: Any) -> Container:
-        """Runs a docker container using the preconfigured image name
-        and a mix of the preconfigured container options and those passed
+        """Runs a docker container using the pre-configured image name
+        and a mix of the pre-configured container options and those passed
         to this method.
 
         Keeps track of the docker.Container instance spawned to kill it
@@ -102,6 +108,7 @@ class TrackedContainer:
         timeout: int,
         no_warnings: bool = True,
         no_errors: bool = True,
+        no_failure: bool = True,
         **kwargs: Any,
     ) -> str:
         running_container = self.run_detached(**kwargs)
@@ -109,11 +116,9 @@ class TrackedContainer:
         logs = running_container.logs().decode("utf-8")
         assert isinstance(logs, str)
         LOGGER.debug(logs)
-        if no_warnings:
-            assert not self.get_warnings(logs)
-        if no_errors:
-            assert not self.get_errors(logs)
-        assert rv == 0 or rv["StatusCode"] == 0
+        assert no_warnings == (not self.get_warnings(logs))
+        assert no_errors == (not self.get_errors(logs))
+        assert no_failure == (rv["StatusCode"] == 0)
         return logs
 
     @staticmethod

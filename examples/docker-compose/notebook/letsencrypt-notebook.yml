@@ -18,9 +18,9 @@ services:
       USE_HTTPS: "yes"
       PASSWORD: ${PASSWORD}
     command: >
-      start-notebook.sh
-      --NotebookApp.certfile=/etc/letsencrypt/fullchain.pem
-      --NotebookApp.keyfile=/etc/letsencrypt/privkey.pem
+      start-notebook.py
+      --ServerApp.certfile=/etc/letsencrypt/fullchain.pem
+      --ServerApp.keyfile=/etc/letsencrypt/privkey.pem
 
 volumes:
   work:

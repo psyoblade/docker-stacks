@@ -1,6 +1,5 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-
 import logging
 import time
 from typing import Optional
@@ -26,7 +25,7 @@ LOGGER = logging.getLogger(__name__)
             ["JUPYTERHUB_API_TOKEN=my_token"],
             "jupyterhub-singleuser",
             False,
-            ["WARNING: using start-singleuser.sh"],
+            ["WARNING: using start-singleuser.py"],
         ),
     ],
 )
@@ -38,24 +37,23 @@ def test_start_notebook(
     expected_start: bool,
     expected_warnings: list[str],
 ) -> None:
-    """Test the notebook start-notebook script"""
+    """Test the notebook start-notebook.py script"""
     LOGGER.info(
-        f"Test that the start-notebook launches the {expected_command} server from the env {env} ..."
+        f"Test that the start-notebook.py launches the {expected_command} server from the env {env} ..."
     )
     host_port = find_free_port()
     running_container = container.run_detached(
         tty=True,
         environment=env,
-        command=["start-notebook.sh"],
         ports={"8888/tcp": host_port},
     )
     # sleeping some time to let the server start
-    time.sleep(3)
+    time.sleep(2)
     logs = running_container.logs().decode("utf-8")
     LOGGER.debug(logs)
     # checking that the expected command is launched
     assert (
-        f"Executing the command: {expected_command}" in logs
+        f"Executing: {expected_command}" in logs
     ), f"Not the expected command ({expected_command}) was launched"
     # checking errors and warnings in logs
     assert "ERROR" not in logs, "ERROR(s) found in logs"
@@ -78,10 +76,7 @@ def test_tini_entrypoint(
     https://superuser.com/questions/632979/if-i-know-the-pid-number-of-a-process-how-can-i-get-its-name
     """
     LOGGER.info(f"Test that {command} is launched as PID {pid} ...")
-    running_container = container.run_detached(
-        tty=True,
-        command=["start.sh"],
-    )
+    running_container = container.run_detached(tty=True)
     # Select the PID 1 and get the corresponding command
     cmd = running_container.exec_run(f"ps -p {pid} -o comm=")
     output = cmd.output.decode("utf-8").strip("\n")

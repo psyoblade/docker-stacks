@@ -13,13 +13,14 @@ from tagging.manifests import (
 )
 from tagging.taggers import (
     DateTagger,
-    HadoopVersionTagger,
     JavaVersionTagger,
     JuliaVersionTagger,
     JupyterHubVersionTagger,
     JupyterLabVersionTagger,
     JupyterNotebookVersionTagger,
+    PythonMajorMinorVersionTagger,
     PythonVersionTagger,
+    PytorchVersionTagger,
     RVersionTagger,
     SHATagger,
     SparkVersionTagger,
@@ -37,18 +38,24 @@ class ImageDescription:
 
 
 ALL_IMAGES = {
-    "base-notebook": ImageDescription(
+    "docker-stacks-foundation": ImageDescription(
         parent_image=None,
         taggers=[
             SHATagger(),
             DateTagger(),
             UbuntuVersionTagger(),
+            PythonMajorMinorVersionTagger(),
             PythonVersionTagger(),
+        ],
+        manifests=[CondaEnvironmentManifest(), AptPackagesManifest()],
+    ),
+    "base-notebook": ImageDescription(
+        parent_image="docker-stacks-foundation",
+        taggers=[
             JupyterNotebookVersionTagger(),
             JupyterLabVersionTagger(),
             JupyterHubVersionTagger(),
         ],
-        manifests=[CondaEnvironmentManifest(), AptPackagesManifest()],
     ),
     "minimal-notebook": ImageDescription(parent_image="base-notebook"),
     "scipy-notebook": ImageDescription(parent_image="minimal-notebook"),
@@ -57,8 +64,16 @@ ALL_IMAGES = {
         taggers=[RVersionTagger()],
         manifests=[RPackagesManifest()],
     ),
+    "julia-notebook": ImageDescription(
+        parent_image="minimal-notebook",
+        taggers=[JuliaVersionTagger()],
+        manifests=[JuliaPackagesManifest()],
+    ),
     "tensorflow-notebook": ImageDescription(
         parent_image="scipy-notebook", taggers=[TensorflowVersionTagger()]
+    ),
+    "pytorch-notebook": ImageDescription(
+        parent_image="scipy-notebook", taggers=[PytorchVersionTagger()]
     ),
     "datascience-notebook": ImageDescription(
         parent_image="scipy-notebook",
@@ -67,7 +82,7 @@ ALL_IMAGES = {
     ),
     "pyspark-notebook": ImageDescription(
         parent_image="scipy-notebook",
-        taggers=[SparkVersionTagger(), HadoopVersionTagger(), JavaVersionTagger()],
+        taggers=[SparkVersionTagger(), JavaVersionTagger()],
         manifests=[SparkInfoManifest()],
     ),
     "all-spark-notebook": ImageDescription(

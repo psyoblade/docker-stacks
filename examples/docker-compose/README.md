@@ -12,7 +12,7 @@ See the [installation instructions](https://docs.docker.com/engine/installation/
 
 ## Quickstart
 
-Build and run a `jupyter/minimal-notebook` container on a VirtualBox VM on local desktop.
+Build and run a `jupyter/minimal-notebook` image on a VirtualBox VM on local desktop.
 
 ```bash
 # create a Docker Machine-controlled VirtualBox VM
@@ -42,7 +42,7 @@ You can customize the docker-stack notebook image to deploy by modifying the `no
 For example, you can build and deploy a `jupyter/all-spark-notebook` by modifying the Dockerfile like so:
 
 ```dockerfile
-FROM jupyter/all-spark-notebook:6b49f3337709
+FROM quay.io/jupyter/all-spark-notebook
 # Your RUN commands and so on
 ```
 
@@ -86,8 +86,8 @@ NAME=your-notebook PORT=9001 WORK_VOLUME=our-work notebook/up.sh
 
 ### How do I run over HTTPS?
 
-To run the notebook server with a self-signed certificate, pass the `--secure` option to the `up.sh` script.
-You must also provide a password, which will be used to secure the notebook server.
+To run the Jupyter Server with a self-signed certificate, pass the `--secure` option to the `up.sh` script.
+You must also provide a password, which will be used to secure the Jupyter Server.
 You can specify the password by setting the `PASSWORD` environment variable, or by passing it to the `up.sh` script.
 
 ```bash
