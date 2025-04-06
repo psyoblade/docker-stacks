@@ -3,16 +3,24 @@
 
 ## 도커 이미지 빌드
 ```bash
-$> docker build -t psyoblade/all-spark-notebook .
-```
+VERSION=1.8
 
-## 도커를 통한 실행 
-```bash
-$> docker run --rm --name notebook -v notebooks:/home/jovyan/work -p 8888:8888 -d psyoblade/all-spark-notebook
+# 로컬 환경에서 빌드
+docker build -t local/data-engineer-all-spark-notebook:${VERSION} .
+
+# 빌드된 노트북 테스트 
+docker run --rm --name notebook -v `pwd`/notebooks:/home/jovyan/work -p 8888:8888 -d local/data-engineer-all-spark-notebook:${VERSION}
+
+# 태그 후 도커허브에 푸시
+docker tag local/data-engineer-all-spark-notebook:${VERSION} psyoblade/data-engineer-all-spark-notebook:${VERSION}
+docker push psyoblade/data-engineer-all-spark-notebook:${VERSION}
 ```
 
 ## 도커 컴포즈를 통한 실행
 ```bash
+$> cat .env
+VERSION=1.8
+
 $> cat docker-compose.yml
 version: "3"
 servcies:
@@ -20,15 +28,15 @@ servcies:
     container_name: notebook
     user: root
     privileged: true
-    image: psyoblade/all-spark-notebook
+    image: psyoblade/data-engineer-all-spark-notebook:${VERSION}
     restart: always
     volumes:
       - ./notebooks:/home/jovyan/work
     environment:
       - GRANT_SUDO=yes
     ports:
-      - "4040:4040"
-      - "4041:4041"
+      - "4040-4049:4040-4049"
+      - "8080:8080"
       - "8888:8888"
 
 $> docker-compose up -d
