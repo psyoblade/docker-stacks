@@ -1,4 +1,14 @@
-# Jupyter Docker Stacks
+# 주피터 노트북 도커 이미지
+> 본 프로젝트는 https://github.com/jupyter/docker-stacks 에서 클론 이후에 추가적인 컴포넌트 설치 및 배포를 위해 작성된 이미지입니다
+
+
+## 수정내역
+* v1.9 : 멀티 플랫폼 지원
+ - 2025/04/20 : data-engineer-pyspark-notebook:1.9
+ - 2025/04/20 : data-engineer-all-spark-notebook:1.9
+
+
+## Jupyter Docker Stacks
 
 [![GitHub actions badge](https://github.com/jupyter/docker-stacks/actions/workflows/docker.yml/badge.svg)](https://github.com/jupyter/docker-stacks/actions/workflows/docker.yml "Docker images build status")
 [![Read the Docs badge](https://img.shields.io/readthedocs/jupyter-docker-stacks.svg)](https://jupyter-docker-stacks.readthedocs.io/en/latest/ "Documentation build status")
