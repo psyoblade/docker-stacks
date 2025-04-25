@@ -10,7 +10,7 @@
 VERSION=1.9
 
 # 멀티플랫폼(amd64,arm64) 설정으로 빌드 및 도커허브에 푸쉬
-docker buildx build --no-cache --progress=plain -t \
+docker buildx build --no-cache --progress=plain \
     --platform linux/amd64,linux/arm64 \
     -f ubuntu.22-pyspark.3.5.Dockerfile \
     -t psyoblade/data-engineer-pyspark-notebook:${VERSION} \
