@@ -10,7 +10,11 @@
 VERSION=1.9
 
 # 멀티플랫폼(amd64,arm64) 설정으로 빌드 및 도커허브에 푸쉬
-docker buildx build --platform linux/amd64,linux/arm64 -f pyspark.1.9-spark-3.5.Dockerfile -t psyoblade/data-engineer-all-spark-notebook:${VERSION} --push .
+docker buildx build --no-cache --progress=plain -t \
+    --platform linux/amd64,linux/arm64 \
+    -f pyspark.1.9-spark-3.5.Dockerfile \
+    -t psyoblade/data-engineer-all-spark-notebook:${VERSION} \
+    --push .
 ```
 
 ## 도커 이미지 빌드

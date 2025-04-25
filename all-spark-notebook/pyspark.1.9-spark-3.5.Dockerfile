@@ -2,12 +2,8 @@
 # Distributed under the terms of the Modified BSD License.
 ARG OWNER=psyoblade
 ARG VERSION=1.9
-ARG BASE_CONTAINER=${OWNER}/data-engineer-pyspark-notebook:${VERSION}
-FROM --platform=$BUILDPLATFORM $BASE_CONTAINER
+FROM ${OWNER}/data-engineer-pyspark-notebook:${VERSION}
 LABEL maintainer="Suhyuk Park <park.suhyuk@gmail.com>"
-
-ARG TARGETPLATFORM
-ARG BUILDPLATFORM
 
 # Fix: https://github.com/hadolint/hadolint/wiki/DL4006
 # Fix: https://github.com/koalaman/shellcheck/wiki/SC3014

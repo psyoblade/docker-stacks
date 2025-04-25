@@ -2,12 +2,10 @@
 # Distributed under the terms of the Modified BSD License.
 ARG OWNER=jupyter
 ARG TAG=ubuntu-22.04
-ARG BASE_CONTAINER=$OWNER/scipy-notebook:$TAG
-FROM --platform=$BUILDPLATFORM $BASE_CONTAINER
+FROM $OWNER/scipy-notebook:$TAG
 LABEL maintainer="Suhyuk Park <park.suhyuk@gmail.com>"
 
-ARG TARGETPLATFORM
-ARG BUILDPLATFORM
+RUN uname -m && dpkg --print-architecture
 
 # Fix: https://github.com/hadolint/hadolint/wiki/DL4006
 # Fix: https://github.com/koalaman/shellcheck/wiki/SC3014
